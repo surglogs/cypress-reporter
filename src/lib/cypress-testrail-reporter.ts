@@ -117,7 +117,7 @@ export class CypressTestRailReporter extends reporters.Spec {
 
       runner.on('fail', (test, err) => {
         this.submitResults(Status.Failed, test, `${err.message}`)
-        TestRailNotifier.notifySlack(`Test "${test.title} has failed`, {
+        TestRailNotifier.notifySlack(`Test "${test.title}" has failed.`, {
           channel: process.env.CYPRESS_TESTRAIL_REPORTER_SLACK_CHANNEL,
         })
       })
