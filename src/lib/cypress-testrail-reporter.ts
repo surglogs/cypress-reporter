@@ -6,6 +6,7 @@ import { Status, TestRailResult } from './testrail.interface'
 import { TestRailValidation } from './testrail.validation'
 const TestRailCache = require('./testrail.cache')
 const TestRailLogger = require('./testrail.logger')
+const TestRailNotifier = require('./testrail.notifier')
 const chalk = require('chalk')
 var runCounter = 1
 
