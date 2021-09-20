@@ -24,18 +24,15 @@ export class CypressTestRailReporter extends reporters.Spec {
     this.reporterOptions = options.reporterOptions
 
     if (process.env.CYPRESS_TESTRAIL_REPORTER_USERNAME) {
-      this.reporterOptions.username =
-        process.env.CYPRESS_TESTRAIL_REPORTER_USERNAME
+      this.reporterOptions.username = process.env.CYPRESS_TESTRAIL_REPORTER_USERNAME
     }
 
     if (process.env.CYPRESS_TESTRAIL_REPORTER_PASSWORD) {
-      this.reporterOptions.password =
-        process.env.CYPRESS_TESTRAIL_REPORTER_PASSWORD
+      this.reporterOptions.password = process.env.CYPRESS_TESTRAIL_REPORTER_PASSWORD
     }
 
     if (process.env.CYPRESS_TESTRAIL_REPORTER_RUNNAME) {
-      this.reporterOptions.runName =
-        process.env.CYPRESS_TESTRAIL_REPORTER_RUNNAME
+      this.reporterOptions.runName = process.env.CYPRESS_TESTRAIL_REPORTER_RUNNAME
     }
 
     if (process.env.CYPRESS_TESTRAIL_REPORTER_RUNID) {
@@ -82,37 +79,26 @@ export class CypressTestRailReporter extends reporters.Spec {
          */
         if (!TestRailCache.retrieve('runId')) {
           if (this.reporterOptions.suiteId) {
-            TestRailLogger.log(
-              `Following suiteId has been set in cypress.json file: ${this.suiteId}`,
-            )
+            TestRailLogger.log(`Following suiteId has been set in cypress.json file: ${this.suiteId}`)
           }
           const executionDateTime = moment().format('MMM Do YYYY, HH:mm (Z)')
-          const name = `${
-            this.reporterOptions.runName || 'Automated test run'
-          } ${executionDateTime}`
+          const name = `${this.reporterOptions.runName || 'Automated test run'} ${executionDateTime}`
           if (this.reporterOptions.disableDescription) {
             var description = ''
           } else {
-            var description =
-              'For the Cypress run visit https://dashboard.cypress.io/#/projects/runs'
+            var description = 'For the Cypress run visit https://dashboard.cypress.io/#/projects/runs'
           }
           TestRailLogger.log(`Creating TestRail Run with name: ${name}`)
           this.testRailApi.createRun(name, description, this.suiteId)
         } else {
           // use the cached TestRail Run ID
           this.runId = TestRailCache.retrieve('runId')
-          TestRailLogger.log(
-            `Using existing TestRail Run with ID: '${this.runId}'`,
-          )
+          TestRailLogger.log(`Using existing TestRail Run with ID: '${this.runId}'`)
         }
       })
 
       runner.on('pass', (test) => {
-        this.submitResults(
-          Status.Passed,
-          test,
-          `Execution time: ${test.duration}ms`,
-        )
+        this.submitResults(Status.Passed, test, `Execution time: ${test.duration}ms`)
       })
 
       runner.on('fail', (test, err) => {
@@ -158,9 +144,7 @@ export class CypressTestRailReporter extends reporters.Spec {
         } else {
           var path = `runs/view/${this.runId}`
           TestRailLogger.log(
-            `Results are published to ${chalk.magenta(
-              `${this.reporterOptions.host}/index.php?/${path}`,
-            )}`,
+            `Results are published to ${chalk.magenta(`${this.reporterOptions.host}/index.php?/${path}`)}`,
           )
         }
       })
@@ -175,10 +159,8 @@ export class CypressTestRailReporter extends reporters.Spec {
    */
   public submitResults(status, test, comment) {
     let caseIds = titleToCaseIds(test.title)
-    const serverTestCaseIds = this.testRailApi.getCases()
-    const invalidCaseIds = caseIds.filter(
-      (caseId) => !serverTestCaseIds.includes(caseId),
-    )
+    const serverTestCaseIds = this.testRailApi.getCases(this.suiteId)
+    const invalidCaseIds = caseIds.filter((caseId) => !serverTestCaseIds.includes(caseId))
     caseIds = caseIds.filter((caseId) => serverTestCaseIds.includes(caseId))
     if (invalidCaseIds.length > 0)
       TestRailLogger.log(

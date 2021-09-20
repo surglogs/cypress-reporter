@@ -18,7 +18,8 @@
   "scripts": {
     "tsc": "tsc",
     "clean": "rimraf dist",
-    "build": "npm run clean && npm run tsc"
+    "build": "npm run clean && npm run tsc",
+    "prepublish": "npm run build"
   },
   "dependencies": {
     "@slack/webhook": "^6.0.0",
