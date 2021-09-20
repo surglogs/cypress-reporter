@@ -15,6 +15,7 @@ export class TestRail {
   private retries: number
 
   constructor(private options: TestRailOptions) {
+    TestRailLogger.log('Init testrail with options', options)
     this.base = `${options.host}/index.php?/api/v2`
     this.runId = options.runId
     if (this.runId) {
@@ -57,9 +58,14 @@ export class TestRail {
         },
       })
         .then((response) => {
-          const ids = response.data?.map((item) => item.id)
+          const ids = response.data?.cases?.map((item) => item.id)
           if (!ids || !ids.length) {
-            console.warn('no testrail cases found', this.options.projectId, suiteId, this.options.groupId)
+            TestRailLogger.log(
+              'No testrail cases found',
+              this.options.projectId,
+              suiteId,
+              this.options.groupId,
+            )
           }
           return ids
         })
