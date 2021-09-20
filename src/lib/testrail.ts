@@ -37,14 +37,15 @@ export class TestRail {
     return result
   }
 
-  public getCases() {
-    let url = `${this.base}/get_cases/${this.options.projectId}&suite_id=${this.options.suiteId}`
+  public getCases(suiteId: number) {
+    let url = `${this.base}/get_cases/${this.options.projectId}&suite_id=${suiteId}`
     if (this.options.groupId) {
       url += `&section_id=${this.options.groupId}`
     }
     if (this.options.filter) {
       url += `&filter=${this.options.filter}`
     }
+
     return this.makeSync(
       axios({
         method: 'get',
@@ -56,7 +57,11 @@ export class TestRail {
         },
       })
         .then((response) => {
-          return response.data.map((item) => item.id)
+          const ids = response.data?.map((item) => item.id)
+          if (!ids || !ids.length) {
+            console.warn('no testrail cases found', this.options.projectId, suiteId, this.options.groupId)
+          }
+          return ids
         })
         .catch((error) => console.error(error)),
     )
@@ -65,7 +70,7 @@ export class TestRail {
   public createRun(name: string, description: string, suiteId: number) {
     if (this.options.includeAllInTestRun === false) {
       this.includeAll = false
-      this.caseIds = this.getCases()
+      this.caseIds = this.getCases(suiteId)
     }
     this.makeSync(
       axios({
@@ -128,10 +133,7 @@ export class TestRail {
           }),
       )
     } else {
-      TestRailLogger.warn(
-        'RunId is not set for caseIds:',
-        results.map(({ case_id }) => case_id).join(', '),
-      )
+      TestRailLogger.warn('RunId is not set for caseIds:', results.map(({ case_id }) => case_id).join(', '))
     }
   }
 
