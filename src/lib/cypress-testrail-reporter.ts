@@ -159,13 +159,13 @@ export class CypressTestRailReporter extends reporters.Spec {
    */
   public submitResults(status, test, comment) {
     let caseIds = titleToCaseIds(test.title)
-    const serverTestCaseIds = this.testRailApi.getCases(this.suiteId)
-    const invalidCaseIds = caseIds.filter((caseId) => !serverTestCaseIds.includes(caseId))
-    caseIds = caseIds.filter((caseId) => serverTestCaseIds.includes(caseId))
-    if (invalidCaseIds.length > 0)
-      TestRailLogger.log(
-        `The following test IDs were found in Cypress tests, but not found in Testrail: ${invalidCaseIds}`,
-      )
+    // const serverTestCaseIds = this.testRailApi.getCases(this.suiteId)
+    // const invalidCaseIds = caseIds.filter((caseId) => !serverTestCaseIds.includes(caseId))
+    // caseIds = caseIds.filter((caseId) => serverTestCaseIds.includes(caseId))
+    // if (invalidCaseIds.length > 0)
+    //   TestRailLogger.log(
+    //     `The following test IDs were found in Cypress tests, but not found in Testrail: ${invalidCaseIds}`,
+    //   )
 
     if (caseIds.length) {
       const caseResults = caseIds.map((caseId) => {

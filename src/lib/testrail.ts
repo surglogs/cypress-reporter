@@ -38,6 +38,7 @@ export class TestRail {
     return result
   }
 
+  // TODO: this endpoint returns paginated response, implement getting of all test cases
   public getCases(suiteId: number) {
     let url = `${this.base}/get_cases/${this.options.projectId}&suite_id=${suiteId}`
     if (this.options.groupId) {
