@@ -38,8 +38,31 @@ export class TestRail {
     return result
   }
 
-  // TODO: this endpoint returns paginated response, implement getting of all test cases
   public getCases(suiteId: number) {
+    const call = async (urlToCall: string) => {
+      // console.log('===calling', urlToCall)
+      try {
+        const response = await axios({
+          method: 'get',
+          url: urlToCall,
+          headers: { 'Content-Type': 'application/json' },
+          auth: {
+            username: this.options.username,
+            password: this.options.password,
+          },
+        })
+
+        let cases = response.data?.cases?.map((item) => item.id) || []
+        if (response.data?._links?.next) {
+          cases = [...cases, ...(await call(`${this.options.host}/index.php?${response.data?._links?.next}`))]
+        }
+
+        return cases
+      } catch (e) {
+        console.error(e)
+      }
+    }
+
     let url = `${this.base}/get_cases/${this.options.projectId}&suite_id=${suiteId}`
     if (this.options.groupId) {
       url += `&section_id=${this.options.groupId}`
@@ -48,30 +71,13 @@ export class TestRail {
       url += `&filter=${this.options.filter}`
     }
 
-    return this.makeSync(
-      axios({
-        method: 'get',
-        url: url,
-        headers: { 'Content-Type': 'application/json' },
-        auth: {
-          username: this.options.username,
-          password: this.options.password,
-        },
-      })
-        .then((response) => {
-          const ids = response.data?.cases?.map((item) => item.id)
-          if (!ids || !ids.length) {
-            TestRailLogger.log(
-              'No testrail cases found',
-              this.options.projectId,
-              suiteId,
-              this.options.groupId,
-            )
-          }
-          return ids
-        })
-        .catch((error) => console.error(error)),
-    )
+    const cases = this.makeSync(call(url))
+
+    if (!cases || !cases.length) {
+      TestRailLogger.log('No testrail cases found', this.options.projectId, suiteId, this.options.groupId)
+    }
+
+    return cases
   }
 
   public createRun(name: string, description: string, suiteId: number) {
