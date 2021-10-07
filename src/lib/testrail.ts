@@ -15,7 +15,7 @@ export class TestRail {
   private retries: number
 
   constructor(private options: TestRailOptions) {
-    TestRailLogger.log('Init testrail with options', options)
+    TestRailLogger.debug('Init testrail with options', options)
     this.base = `${options.host}/index.php?/api/v2`
     this.runId = options.runId
     if (this.runId) {
@@ -39,6 +39,15 @@ export class TestRail {
   }
 
   public getCases(suiteId: number) {
+    TestRailLogger.debug(
+      'Calling testrail to get caseIds for project',
+      this.options.projectId,
+      ', suite',
+      suiteId,
+      'and group',
+      this.options.groupId,
+    )
+
     const call = async (urlToCall: string) => {
       // console.log('===calling', urlToCall)
       try {
@@ -77,7 +86,7 @@ export class TestRail {
       TestRailLogger.log('No testrail cases found', this.options.projectId, suiteId, this.options.groupId)
     }
 
-    return cases
+    return cases ?? []
   }
 
   public createRun(name: string, description: string, suiteId: number) {
