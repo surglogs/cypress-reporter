@@ -1,5 +1,7 @@
 import { reporters } from 'mocha'
 import * as moment from 'moment'
+const chalk = require('chalk')
+
 import { TestRail } from './testrail'
 import { titleToCaseIds } from './shared'
 import { Status, TestRailResult } from './testrail.interface'
@@ -7,7 +9,7 @@ import { TestRailValidation } from './testrail.validation'
 const TestRailCache = require('./testrail.cache')
 const TestRailLogger = require('./testrail.logger')
 const TestRailNotifier = require('./testrail.notifier')
-const chalk = require('chalk')
+
 var runCounter = 1
 
 export class CypressTestRailReporter extends reporters.Spec {
@@ -134,8 +136,6 @@ export class CypressTestRailReporter extends reporters.Spec {
           TestRailCache.purge()
         }
 
-        console.log(this.results)
-
         /**
          * Notify about the results at the end of execution
          */
@@ -153,6 +153,16 @@ export class CypressTestRailReporter extends reporters.Spec {
     }
   }
 
+  private caseIds: number[] = undefined
+
+  protected getCaseIds() {
+    if (!this.caseIds) {
+      this.caseIds = this.testRailApi.getCases(this.suiteId)
+    }
+
+    return this.caseIds
+  }
+
   /**
    * Ensure that after each test results are reported continuously
    * Additionally to that if test status is failed or retried there is possibility
@@ -161,10 +171,10 @@ export class CypressTestRailReporter extends reporters.Spec {
    */
   public submitResults(status, test, comment) {
     let caseIds = titleToCaseIds(test.title)
-    const serverTestCaseIds = this.testRailApi.getCases(this.suiteId)
+    const currentTestCaseIds = this.getCaseIds()
     TestRailLogger.debug('Current testrail case ids:', caseIds)
-    const invalidCaseIds = caseIds.filter((caseId) => !serverTestCaseIds.includes(caseId))
-    caseIds = caseIds.filter((caseId) => serverTestCaseIds.includes(caseId))
+    const invalidCaseIds = caseIds.filter((caseId) => !currentTestCaseIds.includes(caseId))
+    caseIds = caseIds.filter((caseId) => currentTestCaseIds.includes(caseId))
     if (invalidCaseIds.length > 0)
       TestRailLogger.log(
         `The following test IDs were found in Cypress tests, but not found in Testrail: ${invalidCaseIds}`,
