@@ -7,13 +7,13 @@ const TestRailLogger = {
       console.log('\n', ...args, '\n')
     }
   },
-  log: (text) => {
+  log: (...args: any[]) => {
     console.log('\n', chalk.magenta.underline.bold('(TestRail Reporter)'))
-    console.log('\n', ' - ' + text, '\n')
+    console.log('\n', ...args, '\n')
   },
-  warn: (text) => {
+  warn: (...args: any[]) => {
     console.log('\n', chalk.magenta.underline.bold('(TestRail Reporter)'))
-    console.warn('\n', ' - ' + text, '\n')
+    console.warn('\n', ...args, '\n')
   },
 }
 

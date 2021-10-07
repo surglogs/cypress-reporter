@@ -134,13 +134,15 @@ export class CypressTestRailReporter extends reporters.Spec {
           TestRailCache.purge()
         }
 
+        console.log(this.results)
+
         /**
          * Notify about the results at the end of execution
          */
         if (this.results.length == 0) {
-          TestRailLogger.warn(
-            'No testcases were matched with TestRail. Ensure that your tests are declared correctly and titles contain matches to format of Cxxxx',
-          )
+          // TestRailLogger.warn(
+          //   'No testcases were matched with TestRail. Ensure that your tests are declared correctly and titles contain matches to format of Cxxxx',
+          // )
         } else {
           var path = `runs/view/${this.runId}`
           TestRailLogger.log(
