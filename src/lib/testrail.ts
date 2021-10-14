@@ -5,7 +5,12 @@ const path = require('path')
 const FormData = require('form-data')
 const TestRailLogger = require('./testrail.logger')
 const TestRailCache = require('./testrail.cache')
+
 import { TestRailOptions, TestRailResult } from './testrail.interface'
+
+if (process.env.DEBUG) {
+  require('axios-debug-log/enable')
+}
 
 export class TestRail {
   private base: String
@@ -136,7 +141,10 @@ export class TestRail {
   }
 
   public publishResults(results: TestRailResult[]) {
-    this.runId = TestRailCache.retrieve('runId')
+    if (!this.runId) {
+      this.runId = TestRailCache.retrieve('runId')
+    }
+
     if (this.runId) {
       return this.makeSync(
         axios({
