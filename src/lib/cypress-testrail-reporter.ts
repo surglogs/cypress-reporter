@@ -111,10 +111,10 @@ export class CypressTestRailReporter extends reporters.Spec {
       })
 
       // NOTE: we dont need retest state, should be same as "pass"
-      // runner.on('retry', (test) => {
-      //   this.submitResults(Status.Retest, test, 'Cypress retry logic has been triggered!');
-      //   TestRailLogger.log(`Tests triggered retry event..., is it stored in testrail results?`)
-      // })
+      runner.on('retry', (test) => {
+        this.submitResults(Status.Retest, test, 'Cypress retry logic has been triggered!')
+        // TestRailLogger.log(`Tests triggered retry event..., is it stored in testrail results?`)
+      })
 
       runner.on('end', () => {
         /**
