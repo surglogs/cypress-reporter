@@ -142,7 +142,7 @@ export class CypressTestRailReporter extends reporters.Spec {
           /**
            * Remove testrail-cache.txt file at the end of execution
            */
-          TestRailCache.purge()
+          // TestRailCache.purge()
         }
 
         /**
@@ -165,11 +165,15 @@ export class CypressTestRailReporter extends reporters.Spec {
   private caseIds: number[] = undefined
 
   protected getCaseIds() {
-    if (!this.caseIds) {
-      this.caseIds = this.testRailApi.getCases(this.suiteId)
+    let ids = this.caseIds || TestRailCache.retrieve('caseIds')
+
+    if (!ids) {
+      ids = this.testRailApi.getCases(this.suiteId)
+      TestRailCache.store('caseIds', ids)
+      this.caseIds = ids
     }
 
-    return this.caseIds
+    return ids
   }
 
   public submitResultsBatch(results: { status: Status; test: any; comment: string }[]) {
@@ -200,6 +204,8 @@ export class CypressTestRailReporter extends reporters.Spec {
       this.results.push(...caseResults)
       this.testRailApi.publishResults(caseResults)
       // TODO: add uploading of screenshots
+    } else {
+      TestRailLogger.log(`No case ids provided for results:`, results)
     }
   }
 

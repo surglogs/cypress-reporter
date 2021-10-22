@@ -54,7 +54,6 @@ export class TestRail {
     )
 
     const call = async (urlToCall: string) => {
-      // console.log('===calling', urlToCall)
       try {
         const response = await axios({
           method: 'get',
