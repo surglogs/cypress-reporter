@@ -68,6 +68,7 @@ export class CypressTestRailReporter extends reporters.Spec {
      * runner will not be triggered
      */
     if (this.suiteId && this.suiteId.toString().length) {
+      const results: { status: Status; test: any; comment: string }[] = []
       runner.on('start', () => {
         /**
          * runCounter is used to count how many spec files we have during one run
@@ -100,11 +101,13 @@ export class CypressTestRailReporter extends reporters.Spec {
       })
 
       runner.on('pass', (test) => {
-        this.submitResults(Status.Passed, test, `Execution time: ${test.duration}ms`)
+        // this.submitResults(Status.Passed, test, `Execution time: ${test.duration}ms`)
+        results.push({ status: Status.Passed, test, comment: `Execution time: ${test.duration}ms` })
       })
 
       runner.on('fail', (test, err) => {
-        this.submitResults(Status.Failed, test, `${err.message}`)
+        // this.submitResults(Status.Failed, test, `${err.message}`)
+        results.push({ status: Status.Failed, test, comment: err.message })
         TestRailNotifier.notifySlack(`Test "${test.title}" has failed.`, {
           channel: process.env.CYPRESS_TESTRAIL_REPORTER_SLACK_CHANNEL,
         })
@@ -112,11 +115,17 @@ export class CypressTestRailReporter extends reporters.Spec {
 
       // NOTE: we dont need retest state, should be same as "pass"
       runner.on('retry', (test) => {
-        this.submitResults(Status.Retest, test, 'Cypress retry logic has been triggered!')
-        // TestRailLogger.log(`Tests triggered retry event..., is it stored in testrail results?`)
+        // this.submitResults(Status.Retest, test, 'Cypress retry logic has been triggered!')
+        results.push({
+          status: Status.Retest,
+          test,
+          comment: 'Test passed but should be manually tested as well!',
+        })
+        TestRailLogger.debug(`Tests triggered retry event..., is it stored in testrail results?`)
       })
 
       runner.on('end', () => {
+        this.submitResultsBatch(results)
         /**
          * When we reach final number of spec files
          * we should close test run at the end
@@ -161,6 +170,37 @@ export class CypressTestRailReporter extends reporters.Spec {
     }
 
     return this.caseIds
+  }
+
+  public submitResultsBatch(results: { status: Status; test: any; comment: string }[]) {
+    const currentTestCaseIds = this.getCaseIds()
+
+    const caseIds = results
+      .map(({ test }) => titleToCaseIds(test.title))
+      .reduce((sum, item) => sum.concat(item), [])
+
+    TestRailLogger.debug('Current testrail case ids:', currentTestCaseIds.join(', '), caseIds)
+
+    const invalidCaseIds = caseIds.filter((caseId) => !currentTestCaseIds.includes(caseId))
+    // const validCaseIds = caseIds.filter((caseId) => currentTestCaseIds.includes(caseId))
+
+    if (invalidCaseIds.length > 0)
+      TestRailLogger.log(
+        `The following test IDs were found in Cypress tests, but not found in Testrail: ${invalidCaseIds}`,
+      )
+
+    if (caseIds.length) {
+      const caseResults = results
+        .map((item) => {
+          const caseIds = titleToCaseIds(item.test.title)
+          return caseIds.map((caseId) => ({ ...item, caseId }))
+        })
+        .reduce((sum, item) => sum.concat(item), [])
+        .map((item) => ({ case_id: item.caseId, status_id: item.status, comment: item.comment }))
+      this.results.push(...caseResults)
+      this.testRailApi.publishResults(caseResults)
+      // TODO: add uploading of screenshots
+    }
   }
 
   /**
