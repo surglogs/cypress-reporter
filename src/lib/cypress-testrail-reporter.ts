@@ -205,7 +205,10 @@ export class CypressTestRailReporter extends reporters.Spec {
       this.testRailApi.publishResults(caseResults)
       // TODO: add uploading of screenshots
     } else {
-      TestRailLogger.log(, results.map(({test}) => test.title))
+      TestRailLogger.log(
+        `No case ids provided for results:`,
+        results.map(({ test }) => test.title),
+      )
     }
   }
 
