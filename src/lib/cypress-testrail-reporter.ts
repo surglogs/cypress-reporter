@@ -183,7 +183,7 @@ export class CypressTestRailReporter extends reporters.Spec {
       .map(({ test }) => titleToCaseIds(test.title))
       .reduce((sum, item) => sum.concat(item), [])
 
-    TestRailLogger.debug('Current testrail case ids:', currentTestCaseIds.join(', '), caseIds)
+    // TestRailLogger.debug('Current testrail case ids:', currentTestCaseIds.join(', '), caseIds)
 
     const invalidCaseIds = caseIds.filter((caseId) => !currentTestCaseIds.includes(caseId))
     // const validCaseIds = caseIds.filter((caseId) => currentTestCaseIds.includes(caseId))
@@ -205,7 +205,7 @@ export class CypressTestRailReporter extends reporters.Spec {
       this.testRailApi.publishResults(caseResults)
       // TODO: add uploading of screenshots
     } else {
-      TestRailLogger.log(`No case ids provided for results:`, results)
+      TestRailLogger.log(, results.map(({test}) => test.title))
     }
   }
 
