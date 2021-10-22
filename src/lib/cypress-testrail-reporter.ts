@@ -129,7 +129,7 @@ export class CypressTestRailReporter extends reporters.Spec {
         if (numSpecFiles.length > counter) {
           runCounter++
         } else {
-          // this.testRailApi.closeRun();
+          this.testRailApi.closeRun()
           /**
            * Remove testrail-cache.txt file at the end of execution
            */
