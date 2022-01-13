@@ -221,7 +221,7 @@ export class CypressTestRailReporter extends reporters.Spec {
   public submitResults(status, test, comment) {
     let caseIds = titleToCaseIds(test.title)
     const currentTestCaseIds = this.getCaseIds()
-    TestRailLogger.debug('Current testrail case ids:', currentTestCaseIds.join(', '), caseIds)
+    // TestRailLogger.debug('Current testrail case ids:', currentTestCaseIds.join(', '), caseIds)
     const invalidCaseIds = caseIds.filter((caseId) => !currentTestCaseIds.includes(caseId))
     caseIds = caseIds.filter((caseId) => currentTestCaseIds.includes(caseId))
     if (invalidCaseIds.length > 0)
