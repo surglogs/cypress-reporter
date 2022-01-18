@@ -16,11 +16,17 @@ var persist = () => {
 }
 var load = () => {
   if (!fileExists()) {
+    Logger.debug('Cache file', cacheFileName, 'does not exist, creating new one...')
     createFile()
   }
   var dataStr = fs.readFileSync(cacheFileName)
   if (dataStr && dataStr != '') {
-    cacheData = JSON.parse(dataStr)
+    try {
+      cacheData = JSON.parse(dataStr)
+      Logger.debug('Cache file loaded with content', dataStr)
+    } catch (e) {
+      Logger.warn('Cache file parsing failed', e)
+    }
   } else {
     cacheData = {}
   }
