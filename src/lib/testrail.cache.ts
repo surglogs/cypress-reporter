@@ -23,7 +23,7 @@ var load = () => {
   if (dataStr && dataStr != '') {
     try {
       cacheData = JSON.parse(dataStr)
-      Logger.debug('Cache file loaded with content', dataStr)
+      Logger.debug('Cache file loaded with content', cacheData)
     } catch (e) {
       Logger.warn('Cache file parsing failed', e)
     }
