@@ -2,7 +2,7 @@
   "name": "@surglogs/cypress-reporter",
   "version": "1.7.2",
   "description": "A Testrail reporter for cypress including TestRail API basic library",
-  "main": "dist/index.js",
+  "main": "index.js",
   "private": false,
   "keywords": [
     "cypress",
