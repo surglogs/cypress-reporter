@@ -1,6 +1,6 @@
 const chalk = require('chalk')
 
-const TestRailLogger = {
+module.exports = {
   debug: (...args: any[]) => {
     if (process.env.DEBUG) {
       console.log('\n', chalk.magenta.underline.bold('(TestRail Reporter)'))
@@ -16,5 +16,3 @@ const TestRailLogger = {
     console.warn('\n', ...args, '\n')
   },
 }
-
-module.exports = TestRailLogger

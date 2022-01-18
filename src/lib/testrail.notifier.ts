@@ -1,4 +1,5 @@
 const { IncomingWebhook } = require('@slack/webhook')
+const TestRailLogger = require('./testrail.logger')
 
 if (!process.env.CYPRESS_TESTRAIL_REPORTER_SLACK_URL) {
   TestRailLogger.warn(
@@ -6,9 +7,7 @@ if (!process.env.CYPRESS_TESTRAIL_REPORTER_SLACK_URL) {
   )
 }
 
-const webhook = new IncomingWebhook(
-  process.env.CYPRESS_TESTRAIL_REPORTER_SLACK_URL,
-)
+const webhook = new IncomingWebhook(process.env.CYPRESS_TESTRAIL_REPORTER_SLACK_URL)
 
 const notifySlack = (text: string, { channel }: { channel: string }) => {
   return webhook.send({
