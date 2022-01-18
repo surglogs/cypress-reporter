@@ -2,7 +2,7 @@ const fs = require('fs')
 const Logger = require('./testrail.logger')
 
 var cacheFileName = 'testrail-cache.txt'
-var cacheData = {}
+var cacheData = null
 var fileExists = () => {
   return fs.existsSync(cacheFileName)
 }
@@ -10,9 +10,11 @@ var createFile = () => {
   fs.writeFileSync(cacheFileName, '')
 }
 var persist = () => {
-  fs.writeFileSync(cacheFileName, JSON.stringify(cacheData), {
-    flag: 'w',
-  })
+  if (cacheData) {
+    fs.writeFileSync(cacheFileName, JSON.stringify(cacheData), {
+      flag: 'w',
+    })
+  }
 }
 var load = () => {
   if (!fileExists()) {
@@ -32,14 +34,21 @@ var load = () => {
   }
 }
 
+const loadIfNeeded = () => {
+  if (cacheData == null) {
+    load()
+  }
+}
+
 const TestRailCache = {
   store: (key, val) => {
+    loadIfNeeded()
     cacheData[key] = val
     persist()
     Logger.debug('Storing cache', key, val)
   },
   retrieve: (key) => {
-    load()
+    loadIfNeeded()
     Logger.debug('Loading from cache', key, cacheData[key])
     return cacheData[key]
   },
