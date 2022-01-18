@@ -96,7 +96,7 @@ export class TestRail {
   public createRun(name: string, description: string, suiteId: number) {
     if (this.options.includeAllInTestRun === false) {
       this.includeAll = false
-      this.caseIds = this.getCases(suiteId)
+      this.caseIds = TestRailCache.retrieve('caseIds') || this.getCases(suiteId)
     }
     this.makeSync(
       axios({
