@@ -7,10 +7,12 @@ if (!process.env.CYPRESS_TESTRAIL_REPORTER_SLACK_URL) {
   )
 }
 
-const webhook = new IncomingWebhook(process.env.CYPRESS_TESTRAIL_REPORTER_SLACK_URL)
+const webhook = !!process.env.CYPRESS_TESTRAIL_REPORTER_SLACK_URL
+  ? new IncomingWebhook(process.env.CYPRESS_TESTRAIL_REPORTER_SLACK_URL)
+  : null
 
 const notifySlack = (text: string, { channel }: { channel: string }) => {
-  return webhook.send({
+  return webhook?.send({
     text: process.env.CYPRESS_TESTRAIL_REPORTER_SLACK_CONTEXT
       ? [text, process.env.CYPRESS_TESTRAIL_REPORTER_SLACK_CONTEXT].join(', ')
       : text,
